@@ -1,2 +1,4 @@
-# SPMS2
-SPMS repo
+# SPMS
+SPMS Project
+
+Login and Signup are done
