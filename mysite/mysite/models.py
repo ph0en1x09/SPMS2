@@ -25,10 +25,10 @@ class Slot(models.Model):
 
 class NewUser(User):
     class Types(models.TextChoices):
-        MEMBER = "Member", "member"
-        COORDINATOR = "Coordinator", "coordinator"
-        COMMITTEE = "Committee", "committee"
-        MANAGER = "Manager", "manager"
+        MEMBER = "MEMBER", "Member"
+        COORDINATOR = "COORDINATOR", "Coordinator"
+        COMMITTEE = "COMMITTEE", "Committee"
+        MANAGER = "MANAGER", "Manager"
 
     type = models.CharField(_("Type"), max_length=50, choices=Types.choices, default=Types.MEMBER)
     name = models.CharField('name', max_length=50, blank=False)
