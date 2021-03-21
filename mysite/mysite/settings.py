@@ -25,8 +25,9 @@ SECRET_KEY = 'ozx0wn!i+lxici@v_x=d_8q!qf1epir)ru1et%sgy$bmcz&khf'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+AUTH_USER_MODEL = "mysite.NewUser"
 
+ALLOWED_HOSTS = []
 
 # Application definition
 

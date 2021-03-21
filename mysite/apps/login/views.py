@@ -16,7 +16,6 @@ def index(request):
         print(user, username, password)
         if user is not None:
             login(request, user)
-            messages.info(request, "Your Password is " + password)
             return redirect('/userPortal/')
 
     context = {}
