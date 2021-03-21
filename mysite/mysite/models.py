@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User, Group, Permission
+from django.contrib.auth.models import User, Group, Permission, UserManager, AbstractUser
 from django.utils.translation import gettext_lazy as _
 from apps.compPage.models import *
 from apps.coursePage.models import *
@@ -14,16 +14,17 @@ class Slot(models.Model):
 
     # relationships
     # from compPage models.py
-    competition = models.OneToOneField(Competition, on_delete = models.SET_NULL, null = True)
-    game = models.ManyToManyField(Game)
+    competition = models.OneToOneField(Competition, on_delete = models.SET_NULL, null = True, blank=True)
+    game = models.ManyToManyField(Game, blank=True)
 
     # from coursePage models.py
-    course = models.ForeignKey(Course, on_delete = models.SET_NULL, null = True)
+    course = models.ForeignKey(Course, on_delete = models.SET_NULL, null = True, blank=True)
 
     # from partyPage.models
-    event = models.OneToOneField(Event, on_delete = models.SET_NULL, null = True)
+    event = models.OneToOneField(Event, on_delete = models.SET_NULL, null = True, blank=True)
 
 class NewUser(User):
+    objects = UserManager()
     class Types(models.TextChoices):
         MEMBER = "MEMBER", "Member"
         COORDINATOR = "COORDINATOR", "Coordinator"
@@ -41,37 +42,82 @@ class NewUser(User):
 
     # relationships for Member
     # from coursePage.models
-    courses = models.ForeignKey(Course, on_delete = models.SET_NULL, null = True)
+    courses = models.ForeignKey(Course, on_delete = models.SET_NULL, null = True, blank=True)
 
     # from partyPage.models
-    event = models.OneToOneField(Event, on_delete = models.SET_NULL, null = True)
+    event = models.OneToOneField(Event, on_delete = models.SET_NULL, null = True, blank=True)
 
     # relationships for coordinator
     # from coursePage.models
-    courses = models.ForeignKey(Course, on_delete = models.SET_NULL, null = True)
+    courses = models.ForeignKey(Course, on_delete = models.SET_NULL, null = True, blank=True)
+
+
+class MemberManager(UserManager):
+    def get_queryset(self, *args, **kwargs):
+        return super().get_queryset(*args, *kwargs).filter(type=NewUser.Types.MEMBER)
+
+
+class CoordinatorManager(UserManager):
+    def get_queryset(self, *args, **kwargs):
+        return super().get_queryset(*args, *kwargs).filter(type=NewUser.Types.COORDINATOR)
+
+
+class CommitteeManager(UserManager):
+    def get_queryset(self, *args, **kwargs):
+        return super().get_queryset(*args, *kwargs).filter(type=NewUser.Types.COMMITTEE)
+
+
+class ManagerManager(UserManager):
+    def get_queryset(self, *args, **kwargs):
+        return super().get_queryset(*args, *kwargs).filter(type=NewUser.Types.MANAGER)
 
 
 class Member(NewUser):
+    objects = MemberManager()
+
     class Meta:
         proxy = True
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.type = NewUser.Types.MEMBER
+        return super().save(*args, **kwargs)
 
 
 class Coordinator(NewUser):
     is_coordinator = True
+    objects = CoordinatorManager()
 
     class Meta:
         proxy = True
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.type = NewUser.Types.COORDINATOR
+        return super().save(*args, **kwargs)
 
 
 class Committee(NewUser):
     is_committee = True
+    objects = CommitteeManager()
 
     class Meta:
         proxy = True
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.type = NewUser.Types.COMMITTEE
+        return super().save(*args, **kwargs)
 
 
 class Manager(NewUser):
     is_superuser = True
+    objects = ManagerManager()
 
     class Meta:
         proxy = True
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.type = NewUser.Types.MANAGER
+        return super().save(*args, **kwargs)

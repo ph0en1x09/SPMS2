@@ -12,10 +12,10 @@ class Feedback(models.Model):
 
     # relationships
     # from mysite.models
-    member = models.OneToOneField(Member, on_delete = models.SET_NULL, null = True)
+    member = models.ManyToManyField(Member)
 
 
 class Complaint(Feedback):
     # relationships
     # from mysite.models
-    coordinator = models.OneToOneField(Coordinator, on_delete = models.SET_NULL, null = True)
+    coordinator = models.ManyToManyField(Coordinator)

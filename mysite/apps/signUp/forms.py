@@ -3,9 +3,11 @@ from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from mysite.models import Member
 
+class DateInput(forms.DateInput):
+	input_type = 'date'
 
 class CreateUserForm(UserCreationForm):
-    age = forms.DateField(widget = forms.SelectDateWidget)
+    age = forms.DateField(widget = DateInput)
     gender = forms.CharField(max_length = 100)
 
     class Meta:
